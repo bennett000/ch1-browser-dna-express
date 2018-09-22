@@ -1,5 +1,11 @@
 import { Fingerprint as ClientFingerprint } from '@ch1/browser-dna';
 export { Fingerprint as ClientFingerprint } from '@ch1/browser-dna';
+import { Request } from 'express';
+export { Request } from 'express';
+
+export interface FingerprintedRequest extends Request {
+  fingerprint: Fingerprint;
+}
 
 export interface Fingerprint {
   connection: ConnectionFingerprint;

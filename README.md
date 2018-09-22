@@ -11,8 +11,10 @@ _This is not well maintained_
 ## What is This
 
 Fingerprinting middleware for express. This middleware grabs information
-about a connection and puts it on the `res.locals` object of each request.
+about a connection and puts it on the `req` object of each request.
 Consumers will need to use some other middleware to store this.
+
+(The library still supports the legacy `res.locals.fingerprint` interface)
 
 The middleware also consumes request body's that have a fingerprint object
 that comes from [@ch1/browser-dna](https://www.npmjs.com/package/@ch1/browser-dna 'Browser fingerprinting library')
@@ -60,13 +62,13 @@ import { fingerprint } from '@ch1/browser-dna-express';
 app.use(fingerprint());
 
 // then on the next middleware
-app.use((req: Request, res: Response, next: Function) => {
-  console.log(JSON.stringify(res.locals.fingerprint, null, 2));
+app.use((req: FingerprintedRequest, res: Response, next: Function) => {
+  console.log(JSON.stringify(req.fingerprint, null, 2));
   next();
 });
 ```
 
-The `res.locals.fingerprint` object is populated as follows:
+The `req.fingerprint` object is populated as follows:
 
 ```ts
 export interface Fingerprint {
