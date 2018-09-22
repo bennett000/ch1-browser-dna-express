@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import {
   noop,
   toGtZeroIntMax,
@@ -9,11 +9,12 @@ import {
 import {
   ClientFingerprint,
   ConnectionFingerprint,
+  FingerprintedRequest,
   ServerFingerprint
 } from './interfaces';
 
 export function fingerprint() {
-  return (req: Request, res: Response, next: Function) => {
+  return (req: FingerprintedRequest, res: Response, next: Function) => {
     connectionFingerprint(req, res, noop);
     serverFingerprint(req, res, noop);
 
@@ -26,7 +27,7 @@ export function fingerprint() {
 }
 
 export function connectionFingerprint(
-  req: Request,
+  req: FingerprintedRequest,
   res: Response,
   next: Function
 ) {
@@ -36,18 +37,28 @@ export function connectionFingerprint(
     method: toStringMax(16, req.method)
   };
 
+  req.fingerprint = req.fingerprint || {};
+  req.fingerprint.connection = connectionFingerprint;
+
   res.locals.fingerprint = res.locals.fingerprint || {};
   res.locals.fingerprint.connection = connectionFingerprint;
 
   next();
 }
 
-export function serverFingerprint(req: Request, res: Response, next: Function) {
+export function serverFingerprint(
+  req: FingerprintedRequest,
+  res: Response,
+  next: Function
+) {
   const serverFingerprint: ServerFingerprint = {
     language: toStringMax(64, req.get('Accept-Language')),
     userAgent: toStringMax(512, req.get('User-Agent')),
     usesDnt: parseInt(toString(req.get('DNT')), 10) ? true : false
   };
+
+  req.fingerprint = req.fingerprint || {};
+  req.fingerprint.server = serverFingerprint;
 
   res.locals.fingerprint = res.locals.fingerprint || {};
   res.locals.fingerprint.server = serverFingerprint;
@@ -55,7 +66,11 @@ export function serverFingerprint(req: Request, res: Response, next: Function) {
   next();
 }
 
-export function clientFingerprint(req: Request, res: Response, next: Function) {
+export function clientFingerprint(
+  req: FingerprintedRequest,
+  res: Response,
+  next: Function
+) {
   if (!req.body.fingerprint) {
     next();
     return;
@@ -74,6 +89,9 @@ export function clientFingerprint(req: Request, res: Response, next: Function) {
     usesCookies: fp.usesCookies ? true : false,
     usesTouch: fp.usesTouch ? true : false
   };
+
+  req.fingerprint = req.fingerprint || {};
+  req.fingerprint.client = clientFingerprint;
 
   res.locals.fingerprint = res.locals.fingerprint || {};
   res.locals.fingerprint.client = clientFingerprint;

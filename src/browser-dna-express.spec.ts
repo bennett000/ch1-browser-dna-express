@@ -11,7 +11,7 @@ describe('Browser DNA Express', () => {
   });
 
   describe('fingerprint', () => {
-    it('calls next', (done) => {
+    it('calls next', done => {
       fingerprint()(mockReq, mockRes, () => {
         expect(true).toBe(true);
         done();

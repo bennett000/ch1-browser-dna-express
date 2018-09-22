@@ -1,6 +1,6 @@
 {
   "name": "@ch1/browser-dna-express",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Browser DNA Express is a tool for fingerprinting browsers with express",
   "keywords": [
     "CH1",
